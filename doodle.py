@@ -10,7 +10,7 @@ from urllib import request
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser(description='Create DATE polls for meetings and other events, effortlessly')
     parser.add_argument('name', nargs=1, help='Name or topic of the meeting')
     parser.add_argument('--description', type=str, nargs='?', default='', help='Description of the meeting')
     parser.add_argument('--after', type=int, nargs='?', default=9, help='Start meeting after this hour')
