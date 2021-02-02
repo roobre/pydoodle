@@ -4,9 +4,9 @@ import argparse
 import os
 import sys
 import json
-
 import math
 from datetime import datetime, timedelta
+from urllib import request
 
 
 def main():
@@ -21,11 +21,12 @@ def main():
     parser.add_argument('--tz', type=str, nargs='?', default=os.getenv('TZ', 'Europe/Madrid'), help='Timezone')
     parser.add_argument('--maybe', action='store_true', default=False, help='Allow "Yes, if need to be" answer')
     parser.add_argument('--dates', type=str, nargs='?', default=":+3",
-                        help='Date range [isodate|+ndays]:<isodate|+ndays>')
+                        help='Date range [isodate|+ndays]:<isodate|+ndays>. "ndays" is relative to today')
     parser.add_argument('--organizer', nargs='?', default='Pyydle', help='Name of the organizer')
     parser.add_argument('--email', type=str, nargs='?', default='nobody@devnullmail.com', help='Author email')
     parser.add_argument('--notify', action='store_true', default=False, help='Send notifications to author')
     parser.add_argument('--sure', action='store_true', default=False, help='Confirm creation despite weirdness')
+    parser.add_argument('--dry-run', action='store_true', default=False, help='Just print the request')
     args = parser.parse_args()
 
     dates = dates_from_arg(args)
@@ -52,7 +53,7 @@ def main():
             else:
                 start = end
 
-    print(json.dumps(create_doodle(options, args)))
+    create_doodle(options, args)
 
 
 def derelativize_date(datestr: str):
@@ -73,14 +74,14 @@ def dates_from_arg(args):
     start = derelativize_date(parts[0])
 
     dates = []
-    for d in range(0, (start - derelativize_date(parts[1])).days):
+    for d in range(0, (derelativize_date(parts[1]) - start).days):
         dates.append(start + timedelta(days=d))
 
     return dates
 
 
 def create_doodle(options: list, args):
-    req = {
+    body = {
         "initiator": {
             "name": args.organizer,
             "email": args.email,
@@ -102,7 +103,30 @@ def create_doodle(options: list, args):
         "askPhone": False,
         "locale": "en"
     }
-    return req
+
+    if args.dry_run:
+        print(json.dumps(body))
+        return
+
+    req = request.Request(
+        'https://doodle.com/api/v2.0/polls',
+        method='POST',
+        data=json.dumps(body).encode('utf-8'),
+        headers={
+            "User-Agent": "doodle.py",
+            "Content-Type": 'application/json',
+            "Origin": "https://doodle.com",
+            "Accept": "application/json",
+            "DNT": "1",
+        },
+    )
+
+    with request.urlopen(req) as f:
+        if f.status != 200:
+            print(f"Error creating poll: {f.reason}")
+            return
+        response = json.load(f)
+        print(f"https://doodle.com/poll/{response['id']}")
 
 
 if __name__ == "__main__":
