@@ -60,14 +60,14 @@ def main():
     create_doodle(options, args)
 
 
-def derelativize_date(datestr: str):
+def derelativize_date(datestr: str, base=datetime.now()):
     if datestr == '':
-        return datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        return base.replace(hour=0, minute=0, second=0, microsecond=0)
 
     if not datestr.startswith('+'):
         return datetime.strptime(datestr, '%Y-%m-%d')
 
-    return datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=int(datestr[1:]))
+    return base.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=int(datestr[1:]))
 
 
 def dates_from_arg(args):
@@ -78,7 +78,7 @@ def dates_from_arg(args):
     start = derelativize_date(parts[0])
 
     dates = []
-    for d in range(0, (derelativize_date(parts[1]) - start).days):
+    for d in range(0, (derelativize_date(parts[1], start) - start).days):
         dates.append(start + timedelta(days=d))
 
     return dates
