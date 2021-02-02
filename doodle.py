@@ -45,8 +45,8 @@ def main():
                 break
             options.append({
                 "allday": False,
-                "start": int(start.timestamp()),
-                "end": int(end.timestamp()),
+                "start": int(start.timestamp()) * 1000,
+                "end": int(end.timestamp()) * 1000,
             })
             if args.align:
                 start += timedelta(hours=math.ceil(args.duration / 60))
