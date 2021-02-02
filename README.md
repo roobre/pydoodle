@@ -24,6 +24,13 @@ Manually specify dates
 ./doodle.py MyMeeting --duration 45 --dates 2020-01-15:2020-01-18 --after 10 --before 19
 ```
 
+Create 1h meetings (default `--duration`) but create slots every 30m for extra flexibility:
+
+```shell
+./doodle.py MyMeeting --slot 30 --dates 2020-01-15:2020-01-18
+```
+
+
 Many other tweaks and endless possibilities can be achieved by reading the help:
 
 ```

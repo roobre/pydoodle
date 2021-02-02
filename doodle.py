@@ -16,12 +16,13 @@ def main():
     parser.add_argument('--after', type=int, nargs='?', default=9, help='Start meeting after this hour')
     parser.add_argument('--before', type=int, nargs='?', default=17, help='End meeting before or at this hour')
     parser.add_argument('--duration', type=int, nargs='?', default=60, help='Duration of the meeting in minutes')
-    parser.add_argument('--align', type=bool, nargs='?', default=True, help='Align start meetings to start at :00')
+    parser.add_argument('--slot', type=int, nargs='?', default=0,
+                        help='Create slots set this minutes apart. By default will round duration up to hours')
     parser.add_argument('--workdays', type=bool, nargs='?', default=True, help='Create meeting on workdays only')
     parser.add_argument('--tz', type=str, nargs='?', default=os.getenv('TZ', 'Europe/Madrid'), help='Timezone')
     parser.add_argument('--maybe', action='store_true', default=False, help='Allow "Yes, if need to be" answer')
     parser.add_argument('--dates', type=str, nargs='?', default=":+3",
-                        help='Date range [isodate|+ndays]:<isodate|+ndays>. "ndays" is relative to today')
+                        help='Date range [isodate|+ndays]:<isodate|+mdays>. "ndays" is relative to today, mdays to first date.')
     parser.add_argument('--organizer', nargs='?', default='Pyydle', help='Name of the organizer')
     parser.add_argument('--email', type=str, nargs='?', default='nobody@devnullmail.com', help='Author email')
     parser.add_argument('--notify', action='store_true', default=False, help='Send notifications to author')
@@ -36,6 +37,11 @@ def main():
         print('Please confirm you really want to do this by passing --sure', file=sys.stderr)
         exit(1)
 
+    if args.slot == 0:
+        slot = timedelta(hours=math.ceil(args.duration / 60))
+    else:
+        slot = timedelta(minutes=args.slot)
+
     options = []
     for day in dates_from_arg(args):
         start = day.replace(hour=args.after)
@@ -48,10 +54,8 @@ def main():
                 "start": int(start.timestamp()) * 1000,
                 "end": int(end.timestamp()) * 1000,
             })
-            if args.align:
-                start += timedelta(hours=math.ceil(args.duration / 60))
-            else:
-                start = end
+
+            start += slot
 
     create_doodle(options, args)
 
