@@ -35,9 +35,9 @@ Many other tweaks and endless possibilities can be achieved by reading the help:
 
 ```
 usage: doodle.py [-h] [--description [DESCRIPTION]] [--after [AFTER]] [--before [BEFORE]]
-                 [--duration [DURATION]] [--align [ALIGN]] [--workdays [WORKDAYS]]
-                 [--tz [TZ]] [--maybe] [--dates [DATES]] [--organizer [ORGANIZER]]
-                 [--email [EMAIL]] [--notify] [--sure] [--dry-run]
+                 [--duration [DURATION]] [--slot [SLOT]] [--workdays [WORKDAYS]] [--tz [TZ]] [--maybe]
+                 [--dates [DATES]] [--organizer [ORGANIZER]] [--email [EMAIL]] [--notify] [--sure]
+                 [--dry-run]
                  name
 
 Process some integers.
@@ -53,13 +53,13 @@ optional arguments:
   --before [BEFORE]     End meeting before or at this hour
   --duration [DURATION]
                         Duration of the meeting in minutes
-  --align [ALIGN]       Align start meetings to start at :00
+  --slot [SLOT]         Create slots set this minutes apart. By default will round duration up to hours
   --workdays [WORKDAYS]
                         Create meeting on workdays only
   --tz [TZ]             Timezone
   --maybe               Allow "Yes, if need to be" answer
-  --dates [DATES]       Date range [isodate|+ndays]:<isodate|+ndays>. "ndays" is relative to
-                        today
+  --dates [DATES]       Date range [isodate|+ndays]:<isodate|+mdays>. "ndays" is relative to today, mdays to
+                        first date.
   --organizer [ORGANIZER]
                         Name of the organizer
   --email [EMAIL]       Author email
