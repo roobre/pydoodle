@@ -18,7 +18,7 @@ def main():
     parser.add_argument('--duration', type=int, nargs='?', default=60, help='Duration of the meeting in minutes')
     parser.add_argument('--slot', type=int, nargs='?', default=0,
                         help='Create slots set this minutes apart. By default will round duration up to hours')
-    parser.add_argument('--weekdays', action='store_true', default=False, help='Create meeting on workdays only')
+    parser.add_argument('--weekdays', action='store_true', default=False, help='Create meeting on weekdays only')
     parser.add_argument('--weekends', action='store_true', default=False, help='Create meeting on weekends only')
     parser.add_argument('--tz', type=str, nargs='?', default=os.getenv('TZ', 'Europe/Madrid'), help='Timezone')
     parser.add_argument('--maybe', action='store_true', default=False, help='Allow "Yes, if need to be" answer')

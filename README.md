@@ -34,7 +34,7 @@ Create 1h meetings (default `--duration`) but create slots every 30m for extra f
 Many other tweaks and endless possibilities can be achieved by reading the help:
 
 ```
-> $ ./doodle.py -h                                                                         [±feat/weekdays ●●]
+> $ ./doodle.py -h                                                                          [±feat/weekdays ●]
 usage: doodle.py [-h] [--description [DESCRIPTION]] [--after [AFTER]] [--before [BEFORE]]
                  [--duration [DURATION]] [--slot [SLOT]] [--weekdays] [--weekends] [--tz [TZ]] [--maybe]
                  [--dates [DATES]] [--organizer [ORGANIZER]] [--email [EMAIL]] [--notify] [--sure]
@@ -55,7 +55,7 @@ optional arguments:
   --duration [DURATION]
                         Duration of the meeting in minutes
   --slot [SLOT]         Create slots set this minutes apart. By default will round duration up to hours
-  --weekdays            Create meeting on workdays only
+  --weekdays            Create meeting on weekdays only
   --weekends            Create meeting on weekends only
   --tz [TZ]             Timezone
   --maybe               Allow "Yes, if need to be" answer
