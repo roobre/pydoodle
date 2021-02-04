@@ -18,7 +18,8 @@ def main():
     parser.add_argument('--duration', type=int, nargs='?', default=60, help='Duration of the meeting in minutes')
     parser.add_argument('--slot', type=int, nargs='?', default=0,
                         help='Create slots set this minutes apart. By default will round duration up to hours')
-    parser.add_argument('--workdays', type=bool, nargs='?', default=True, help='Create meeting on workdays only')
+    parser.add_argument('--weekdays', action='store_true', default=False, help='Create meeting on workdays only')
+    parser.add_argument('--weekends', action='store_true', default=False, help='Create meeting on weekends only')
     parser.add_argument('--tz', type=str, nargs='?', default=os.getenv('TZ', 'Europe/Madrid'), help='Timezone')
     parser.add_argument('--maybe', action='store_true', default=False, help='Allow "Yes, if need to be" answer')
     parser.add_argument('--dates', type=str, nargs='?', default=":+3",
@@ -60,14 +61,15 @@ def main():
     create_doodle(options, args)
 
 
+# Parse date string and return date and whether it was relative or not
 def derelativize_date(datestr: str, base=datetime.now()):
     if datestr == '':
-        return base.replace(hour=0, minute=0, second=0, microsecond=0)
+        return base.replace(hour=0, minute=0, second=0, microsecond=0), True
 
     if not datestr.startswith('+'):
         return datetime.strptime(datestr, '%Y-%m-%d')
 
-    return base.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=int(datestr[1:]))
+    return base.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=int(datestr[1:])), True
 
 
 def dates_from_arg(args):
@@ -75,11 +77,29 @@ def dates_from_arg(args):
     if len(parts) != 2:
         raise Exception('Malformed date string. See -h')
 
-    start = derelativize_date(parts[0])
+    start, _ = derelativize_date(parts[0])
+    end, relative = derelativize_date(parts[1], start)
+    ndays = (end - start).days  # Number of days to generate slots on
 
     dates = []
-    for d in range(0, (derelativize_date(parts[1], start) - start).days):
-        dates.append(start + timedelta(days=d))
+
+    i = 0
+    while i < ndays:
+        if args.weekdays:
+            if start.weekday() < 5:
+                dates.append(start)
+            elif relative:
+                i -= 1  # Do not count non-matching days if end date was relative
+        elif args.weekends:
+            if start.weekday() >= 5:
+                dates.append(start)
+            elif relative:
+                i -= 1  # Do not count non-matching days if end date was relative
+        else:
+            dates.append(start)
+
+        start += timedelta(days=1)
+        i += 1
 
     return dates
 
