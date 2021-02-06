@@ -79,7 +79,7 @@ def dates_from_arg(args):
 
     start, _ = derelativize_date(parts[0])
     end, relative = derelativize_date(parts[1], start)
-    ndays = (end - start).days  # Number of days to generate slots on
+    ndays = (end - start).days + 1  # Number of days to generate slots on
 
     dates = []
 
