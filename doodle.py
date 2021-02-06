@@ -23,7 +23,8 @@ def main():
     parser.add_argument('--tz', type=str, nargs='?', default=os.getenv('TZ', 'Europe/Madrid'), help='Timezone')
     parser.add_argument('--maybe', action='store_true', default=False, help='Allow "Yes, if need to be" answer')
     parser.add_argument('--dates', type=str, nargs='?', default=":+3",
-                        help='Date range [isodate|+ndays]:<isodate|+mdays>. "ndays" is relative to today, mdays to first date.')
+                        help='Date range [isodate|+ndays]:<isodate|+mdays>. ' +
+                             '"ndays" is relative to today, mdays to first date.')
     parser.add_argument('--organizer', nargs='?', default='Pyydle', help='Name of the organizer')
     parser.add_argument('--email', type=str, nargs='?', default='nobody@devnullmail.com', help='Author email')
     parser.add_argument('--notify', action='store_true', default=False, help='Send notifications to author')
