@@ -50,11 +50,13 @@ def main():
             end = start + timedelta(minutes=args.duration)
             if end > day.replace(hour=args.before):
                 break
-            options.append({
-                "allday": False,
-                "start": int(start.timestamp()) * 1000,
-                "end": int(end.timestamp()) * 1000,
-            })
+
+            if datetime.now() < start:
+                options.append({
+                    "allday": False,
+                    "start": int(start.timestamp()) * 1000,
+                    "end": int(end.timestamp()) * 1000,
+                })
 
             start += slot
 
