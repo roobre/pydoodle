@@ -65,13 +65,51 @@ def main():
 
 # Parse date string and return date and whether it was relative or not
 def derelativize_date(datestr: str, base=datetime.now()):
-    if datestr == '':
-        return base.replace(hour=0, minute=0, second=0, microsecond=0), True
+    relative = False
 
     if not datestr.startswith('+'):
-        return datetime.strptime(datestr, '%Y-%m-%d')
+        return datetime.strptime(datestr, '%Y-%m-%d'), relative
 
-    return base.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=int(datestr[1:])), True
+    else:
+        relative = True
+        date = base.replace(hour=0, minute=0, second=0, microsecond=0)
+        try:
+            # Try to add date
+            date = date + timedelta(days=int(datestr[1:]))
+        except ValueError:
+            # Leave the date as it is.
+            date = date
+
+        return date, relative
+
+
+def append_dates(
+    days: int, weekday: int, relative: bool,
+    start_date: datetime.date, is_weekdays: bool = False,
+    has_args: bool = True
+):
+    i = 0
+    dates = []
+    if has_args:
+        condition = weekday < 5 if is_weekdays else weekday >= 5
+        while i < days:
+            if condition:
+                dates.append(start_date)
+            elif relative:
+                # Do not count non-matching days if end date was relative
+                i -= 1
+
+            start_date += timedelta(days=1)
+            i += 1
+
+    else:
+        while i < days:
+            dates.append(start_date)
+
+            start_date += timedelta(days=1)
+            i += 1
+
+    return dates
 
 
 def dates_from_arg(args):
@@ -83,25 +121,15 @@ def dates_from_arg(args):
     end, relative = derelativize_date(parts[1], start)
     ndays = (end - start).days + 1  # Number of days to generate slots on
 
+    weekday = start.weekday()
     dates = []
 
-    i = 0
-    while i < ndays:
-        if args.weekdays:
-            if start.weekday() < 5:
-                dates.append(start)
-            elif relative:
-                i -= 1  # Do not count non-matching days if end date was relative
-        elif args.weekends:
-            if start.weekday() >= 5:
-                dates.append(start)
-            elif relative:
-                i -= 1  # Do not count non-matching days if end date was relative
-        else:
-            dates.append(start)
-
-        start += timedelta(days=1)
-        i += 1
+    is_weekdays = True if args.weekdays else False
+    has_args = True if args.weekdays or args.weekends else False
+    dates = append_dates(
+        ndays, weekday, relative, start,
+        is_weekdays=is_weekdays, has_args=has_args
+    )
 
     return dates
 
