@@ -121,7 +121,7 @@ def create_doodle(options: list, args):
         "title": args.name[0],
         "description": args.description,
         "timeZone": True,
-        "preferencesType": "YESNOMAYBE" if args.maybe else "YESNO",
+        "preferencesType": "YESNOIFNEEDBE" if args.maybe else "YESNO",
         "hidden": False,
         "remindInvitees": False,
         "askAddress": False,
