@@ -14,7 +14,9 @@ def main():
     parser.add_argument('name', nargs=1, help='Name or topic of the meeting')
     parser.add_argument('--description', type=str, nargs='?', default='', help='Description of the meeting')
     parser.add_argument('--after', type=int, nargs='?', default=9, help='Start meeting after this hour')
-    parser.add_argument('--before', type=int, nargs='?', default=17, help='End meeting before or at this hour')
+    parser.add_argument('--before', type=int, nargs='?', default=17,
+                        help='End meeting before or at this hour. ' +
+                             'Values greater than 23 will loop through the next day')
     parser.add_argument('--duration', type=int, nargs='?', default=60, help='Duration of the meeting in minutes')
     parser.add_argument('--slot', type=int, nargs='?', default=0,
                         help='Create slots set this minutes apart. By default will round duration up to hours')
@@ -49,7 +51,7 @@ def main():
         start = day.replace(hour=args.after)
         while True:
             end = start + timedelta(minutes=args.duration)
-            if end > day.replace(hour=args.before):
+            if end > day.replace(hour=args.before % 24) + timedelta(days=int(args.before / 24)):
                 break
 
             if datetime.now() < start:
