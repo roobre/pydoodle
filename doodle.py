@@ -13,25 +13,29 @@ def main():
     parser = argparse.ArgumentParser(description='Create DATE polls for meetings and other events, effortlessly')
     parser.add_argument('name', nargs=1, help='Name or topic of the meeting')
     parser.add_argument('--description', type=str, nargs='?', default='', help='Description of the meeting')
-    parser.add_argument('--after', type=int, nargs='?', default=9, help='Start meeting after this hour')
+    parser.add_argument('--after', type=int, nargs='?', default=9, help='Create slots after this hour')
     parser.add_argument('--before', type=int, nargs='?', default=17,
-                        help='End meeting before or at this hour. ' +
+                        help='Do not create slots ending past this hour. ' +
                              'Values greater than 23 will loop through the next day')
     parser.add_argument('--duration', type=int, nargs='?', default=60, help='Duration of the meeting in minutes')
     parser.add_argument('--slot', type=int, nargs='?', default=0,
-                        help='Create slots set this minutes apart. By default will round duration up to hours')
+                        help='Time in minutes between slots start dates, that is, the size of the slot. ' +
+                             'Usually the same as --duration. By default will round --duration up to hours')
     parser.add_argument('--weekdays', action='store_true', default=False, help='Create meeting on weekdays only')
     parser.add_argument('--weekends', action='store_true', default=False, help='Create meeting on weekends only')
-    parser.add_argument('--tz', type=str, nargs='?', default=os.getenv('TZ', 'Europe/Madrid'), help='Timezone')
+    parser.add_argument('--tz', type=str, nargs='?', default=os.getenv('TZ', 'Europe/Madrid'),
+                        help='Timezone. Defaults to $TZ from env, or "Europe/Madrid if empty')
     parser.add_argument('--maybe', action='store_true', default=False, help='Allow "Yes, if need to be" answer')
     parser.add_argument('--dates', type=str, nargs='?', default=":+3",
                         help='Date range [isodate|+ndays]:<isodate|+mdays>. ' +
-                             '"ndays" is relative to today, mdays to first date.')
+                             '"ndays" is relative to today, mdays is relative to the first date.')
     parser.add_argument('--organizer', nargs='?', default='Pyydle', help='Name of the organizer')
-    parser.add_argument('--email', type=str, nargs='?', default='nobody@devnullmail.com', help='Author email')
-    parser.add_argument('--notify', action='store_true', default=False, help='Send notifications to author')
-    parser.add_argument('--sure', action='store_true', default=False, help='Confirm creation despite weirdness')
-    parser.add_argument('--dry-run', action='store_true', default=False, help='Just print the request')
+    parser.add_argument('--email', type=str, nargs='?', default='nobody@devnullmail.com', help='Organizer email')
+    parser.add_argument('--notify', action='store_true', default=False, help='Send notifications to organizer')
+    parser.add_argument('--sure', action='store_true', default=False,
+                        help='Force creation even if supplied parameters do not seem ok')
+    parser.add_argument('--dry-run', action='store_true', default=False,
+                        help='Print the request to doodle servers and do not create the doodle')
     args = parser.parse_args()
 
     dates = dates_from_arg(args)
